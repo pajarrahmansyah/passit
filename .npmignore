@@ -1,0 +1,18 @@
+# source code
+src/
+tests/
+
+# config files
+tsup.config.ts
+tsconfig.json
+.env*
+.gitignore
+vitest.config.ts
+
+# editor
+.vscode/
+.idea/
+
+# os
+.DS_Store
+Thumbs.db
