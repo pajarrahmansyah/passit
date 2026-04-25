@@ -14,5 +14,5 @@ All notable changes to PassIt will be documented here.
 - Response normalization for success and error responses
 - Hooks system with dev/prod environment separation
 - fetch and axios adapter support
-- Next.js plugin via `passit/next`
+- Next.js plugin via `@pajarrahmansyah/passit/next`
 - Full TypeScript support

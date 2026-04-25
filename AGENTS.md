@@ -16,6 +16,7 @@ Client → Next.js Route Handler (PassIt) → Real Backend
 - Runtime: Node.js >= 18
 - Build: tsup
 - Test: vitest
+- Imports: `@/*` alias maps to `src/*`
 - Target: Next.js App Router >= 14
 
 ## Project Structure
@@ -42,7 +43,17 @@ passit/
 │   ├── next/
 │   │   └── plugin.ts         # Next.js config plugin
 │   └── index.ts              # public exports only
-└── tests/                    # mirrors src structure
+├── tests/
+│   ├── unit/                 # unit tests grouped by area
+│   │   ├── core/
+│   │   ├── features/
+│   │   └── utils/
+│   ├── integration/          # opt-in live/public API tests
+│   └── tsconfig.json         # editor/project config for tests
+├── tsconfig.test.json        # test typecheck config
+└── scripts/
+    ├── rewire-dts-aliases.mjs # rewrites @ aliases in emitted .d.ts files
+    └── run-live-tests.mjs     # runs opt-in live integration tests
 ```
 
 ## Core Concepts
@@ -82,6 +93,7 @@ resolveServiceConfig → buildResolvedConfig → forwardRequest
 - `src/index.ts` is the ONLY public API — never export internals
 - `http` config is global only, never per route
 - `baseUrl` is required, no trailing slash allowed
+- Use `@/…` imports for internal source references instead of deep relative paths
 - Retry only triggers on configured `onStatus` codes, never on 2xx or 4xx
 - `normalize` runs before `response` transformer — document this when relevant
 - axios is an optional peer dependency — never assume it is installed
@@ -100,17 +112,20 @@ All types live in `src/core/types.ts`. When adding new features:
 2. Create feature file in `src/features/`
 3. Import and wire it in `src/core/passIt.ts`
 4. Export types from `src/index.ts` if public
-5. Write tests in `tests/features/`
+5. Write unit tests under `tests/unit/` in the matching area
 6. Update README config reference table
 
 ## Testing
 
 ```bash
-npm run test:run    # run once
-npm run test        # watch mode
+npm test            # watch unit tests
+npm run test:unit   # run unit tests once
+npm run test:live   # run opt-in live integration test
+npm run typecheck:tests
 ```
 
-- Tests mirror src structure under `tests/`
+- Unit tests live under `tests/unit/`
+- Live network tests live under `tests/integration/` and should stay opt-in
 - Use `vi.fn()` for mocking adapters in retry tests
 - Use `vi.useFakeTimers()` for tests involving backoff timing
 - Use `vi.stubEnv` for environment dependent hook tests

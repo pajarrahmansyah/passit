@@ -1,5 +1,5 @@
 {
-  "name": "passit",
+  "name": "@pajarrahmansyah/passit",
   "version": "0.0.1",
   "description": "A config-driven proxy gateway for Next.js App Router Route Handlers.",
   "license": "MIT",

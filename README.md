@@ -76,7 +76,7 @@ knows about:              knows about:
 ### Step 1 — Install
 
 ```bash
-npm install passit
+npm install @pajarrahmansyah/passit
 ```
 
 For axios support (optional):
@@ -92,7 +92,7 @@ Create `passit.config.ts` at your project root:
 **Single service:**
 
 ```ts
-import { defineConfig } from 'passit'
+import { defineConfig } from '@pajarrahmansyah/passit'
 
 export default defineConfig({
   baseUrl: 'https://api.backend.com',
@@ -105,7 +105,7 @@ export default defineConfig({
 **Multiple services:**
 
 ```ts
-import { defineConfig } from 'passit'
+import { defineConfig } from '@pajarrahmansyah/passit'
 
 export default defineConfig({
   auth: {
@@ -165,7 +165,7 @@ import '@/passit.config'
 **Option 4 — Next.js plugin**
 
 ```ts
-import { withPassIt } from 'passit/next'
+import { withPassIt } from '@pajarrahmansyah/passit/next'
 
 export default withPassIt({
   // your next.js config
@@ -175,7 +175,7 @@ export default withPassIt({
 ### Step 4 — Use in your routes
 
 ```ts
-import { passIt } from 'passit'
+import { passIt } from '@pajarrahmansyah/passit'
 import { NextRequest } from 'next/server'
 
 export async function GET(req: NextRequest) {
