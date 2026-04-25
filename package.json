@@ -7,7 +7,7 @@
   "homepage": "https://github.com/pajarrahmansyah/passit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pajarrahmansyah/passit.git"
+    "url": "git+https://github.com/pajarrahmansyah/passit.git"
   },
   "bugs": {
     "url": "https://github.com/pajarrahmansyah/passit/issues"

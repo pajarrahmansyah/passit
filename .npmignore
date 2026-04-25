@@ -1,6 +1,15 @@
 # source code
 src/
 tests/
+scripts/
+AGENTS.md
+CLAUDE.md
+tsconfig.json
+tsconfig.test.json
+.env*
+.gitignore
+vitest.config.ts
+tsup.config.ts
 
 # config files
 tsup.config.ts
