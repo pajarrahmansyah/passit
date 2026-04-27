@@ -1,7 +1,8 @@
 import type { NextRequest } from 'next/server'
-import { getConfig, isMultiService } from '@/core/defineConfig'
+import { getConfig, isMultiService } from '@/core/config-store'
 import type {
-    PassItOptions,
+    PassItOptionsSingle,
+    PassItOptionsMulti,
     ResolvedConfig,
     ServiceConfig,
     HooksConfig,
@@ -15,12 +16,14 @@ import { withRetry } from '@/features/retry'
 import { normalizeResponse, resolveNormalizeConfig } from '@/features/normalize'
 import { runRequestHooks, runResponseHooks, runErrorHooks } from '@/features/hooks'
 
-function resolveServiceConfig(options: PassItOptions): ServiceConfig {
+type PassItOptionsAll = PassItOptionsSingle | PassItOptionsMulti<string>
+
+function resolveServiceConfig(options: PassItOptionsAll): ServiceConfig {
     const config = getConfig()
 
     if (!config) {
         throw new Error(
-            '[PassIt] Config not found. Did you forget to import your passit.config.ts?\n\nSee setup guide: https://github.com/pajarrahmansyah/passit#getting-started'
+            '[PassIt] Config not found. Did you forget to import your passit.config.ts?\n\nSee setup guide: https://github.com/pajarrahmansyah/passit'
         )
     }
 
@@ -47,14 +50,14 @@ function resolveServiceConfig(options: PassItOptions): ServiceConfig {
 
 function buildResolvedConfig(
     serviceConfig: ServiceConfig,
-    options: PassItOptions,
+    options: PassItOptionsAll,
 ): ResolvedConfig {
     return {
         baseUrl: options.baseUrl ?? serviceConfig.baseUrl,
         http: serviceConfig.http ?? 'fetch',
         headers: mergeHeaders(
-            options.headers ?? {},
             serviceConfig.headers ?? {},
+            options.headers ?? {},
         ),
         timeout: resolveTimeout(serviceConfig.timeout, options.timeout),
         retry: options.retry ?? serviceConfig.retry ?? null,
@@ -91,12 +94,12 @@ function mergeHooks(
     }
 }
 
-export async function passIt(options: PassItOptions): Promise<Response> {
+export async function passIt(options: PassItOptionsAll): Promise<Response> {
     const serviceConfig = resolveServiceConfig(options)
     const resolved = buildResolvedConfig(serviceConfig, options)
 
     const forwarded = options.req
-        ? forwardRequest(options.req as NextRequest)
+        ? await forwardRequest(options.req as NextRequest)
         : { method: 'GET', headers: {}, body: null, searchParams: '' }
 
     const finalHeaders = mergeHeaders(forwarded.headers, resolved.headers)

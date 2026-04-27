@@ -43,9 +43,9 @@ Config lives in one place. Secrets stay server-side. Routes stay clean.
 - Auto forwarding query params, request body, and dynamic headers
 - Merging headers — PassIt headers always win on same key conflict
 - Timeout handling with per route override
-- Retry logic on server errors only (5xx), never on success or client errors (4xx)
+- Retry logic on configured status codes (`onStatus`). Also fires on network errors and adapter exceptions.
 - Response normalization into consistent success/error shape
-- Content-Type detection — handles JSON, plain text, and HTML responses gracefully
+- Content-Type detection — handles JSON and plain text responses. HTML responses are consumed and returned as `null`.
 - Logging hooks with dev/prod environment separation
 - fetch and axios support via adapter pattern
 
@@ -162,14 +162,22 @@ Add one line to your `app/layout.tsx`:
 import '@/passit.config'
 ```
 
-**Option 4 — Next.js plugin**
+**Option 4 — Next.js plugin + instrumentation**
+
+`withPassIt` enables the instrumentation hook automatically (required for Next.js 14). Pair it with a one-line `instrumentation.ts`:
 
 ```ts
+// next.config.ts
 import { withPassIt } from '@pajarrahmansyah/passit/next'
 
 export default withPassIt({
   // your next.js config
 })
+```
+
+```ts
+// instrumentation.ts
+export { register } from '@pajarrahmansyah/passit/next'
 ```
 
 ### Step 4 — Use in your routes
@@ -259,37 +267,65 @@ export default defineConfig({
 
 | Option | Type | Required | Default | Description |
 |--------|------|----------|---------|-------------|
-| `baseUrl` | `string` | ✅ | — | Real backend base URL, no trailing slash |
-| `http` | `fetch \| axios` | ❌ | `fetch` | HTTP library |
-| `headers` | `Record<string, string>` | ❌ | `{}` | Static headers injected on every request |
-| `timeout` | `number \| false` | ❌ | `5000` | Timeout in ms, `false` to disable |
-| `retry` | `RetryConfig` | ❌ | — | Retry on failure |
-| `normalize` | `boolean \| NormalizeConfig` | ❌ | — | Normalize response shape |
-| `hooks` | `HooksConfig` | ❌ | — | Logging and observability |
+| `baseUrl` | `string` | yes | — | Real backend base URL, no trailing slash |
+| `http` | `fetch \| axios` | no | `fetch` | HTTP library |
+| `headers` | `Record<string, string>` | no | `{}` | Static headers injected on every request |
+| `timeout` | `number \| false` | no | `5000` | Timeout in ms, `false` to disable |
+| `retry` | `RetryConfig` | no | — | Retry on failure |
+| `normalize` | `boolean \| NormalizeConfig` | no | — | Normalize response shape |
+| `hooks` | `HooksConfig` | no | — | Logging and observability |
 
 ### passIt options
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `path` | `string` | ✅ | Backend endpoint path |
-| `req` | `NextRequest` | ✅ | Next.js request object |
-| `service` | `string` | ❌ | Service key for multi service config |
-| `baseUrl` | `string` | ❌ | Overrides global baseUrl |
-| `headers` | `Record<string, string>` | ❌ | Extra headers for this route |
-| `timeout` | `number \| false` | ❌ | Overrides global timeout |
-| `retry` | `RetryConfig` | ❌ | Overrides global retry |
-| `normalize` | `boolean \| NormalizeConfig` | ❌ | Overrides global normalize |
-| `hooks` | `HooksConfig & { override?: boolean }` | ❌ | Route level hooks |
-| `response` | `(data: unknown) => unknown` | ❌ | Custom response transformer. Runs AFTER normalize if both are defined. Disable normalize on that route if you need raw data. |
+| `path` | `string` | yes | Backend endpoint path |
+| `req` | `NextRequest` | optional | Next.js request object — see [Forwarding vs server-initiated requests](#forwarding-vs-server-initiated-requests) |
+| `service` | `string` | optional | Service key for multi service config |
+| `baseUrl` | `string` | no | Overrides global baseUrl |
+| `headers` | `Record<string, string>` | no | Extra headers for this route |
+| `timeout` | `number \| false` | no | Overrides global timeout |
+| `retry` | `RetryConfig` | no | Overrides global retry |
+| `normalize` | `boolean \| NormalizeConfig` | no | Overrides global normalize |
+| `hooks` | `HooksConfig & { override?: boolean }` | no | Route level hooks |
+| `response` | `(data: unknown) => unknown` | no | Custom response transformer. Runs AFTER normalize if both are defined. Disable normalize on that route if you need raw data. |
 
 > **Note:** If both `normalize` and `response` are defined, `response` receives already normalized data. To access raw backend data inside `response`, set `normalize: false` on that route.
+
+### Forwarding vs server-initiated requests
+
+`req` is optional and acts as a **forwarding switch**.
+
+**Pass `req`** when the route depends on the incoming client request — query params, request body, or client headers need to reach the upstream:
+
+```ts
+// Query params, body, and headers from the client are forwarded automatically
+export async function GET(req: NextRequest) {
+  return passIt({ path: '/users', req })
+}
+
+export async function POST(req: NextRequest) {
+  return passIt({ path: '/users', req })
+}
+```
+
+**Omit `req`** when the call is server-initiated and doesn't depend on client input — a health check, a scheduled data fetch, or any route with no dynamic input:
+
+```ts
+// Server-initiated: no query params, no body, no client headers forwarded
+export async function GET() {
+  return passIt({ path: '/users' })
+}
+```
+
+> **Warning:** If you omit `req` on a route that actually receives query params or a request body, they will be silently dropped and never reach the upstream. Always pass `req` when your route handler accepts a `NextRequest`.
 
 ### RetryConfig
 
 | Option | Type | Description |
 |--------|------|-------------|
 | `times` | `number` | Max retry attempts |
-| `onStatus` | `number[]` | Status codes that trigger retry e.g. `[500, 502, 503]` |
+| `onStatus` | `number[]` | Status codes that trigger retry e.g. `[500, 502, 503]`. Any status code is valid — PassIt does not restrict to 5xx only. Retry also fires on network errors and adapter exceptions. |
 
 ### NormalizeConfig
 

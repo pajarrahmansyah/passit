@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { defineConfig, getConfig } from '@/core/defineConfig'
+import { defineConfig } from '@/core/defineConfig'
+import { getConfig } from '@/core/config-store'
 
 beforeEach(() => {
     // reset global config between tests

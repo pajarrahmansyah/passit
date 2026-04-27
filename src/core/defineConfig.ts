@@ -1,6 +1,11 @@
-import type { PassItConfig, ServiceConfig } from '@/core/types'
-
-let globalConfig: PassItConfig | null = null
+import type {
+    PassItConfig,
+    PassItOptionsSingle,
+    PassItOptionsMulti,
+    ServiceConfig,
+} from '@/core/types'
+import { setConfig, isMultiService } from '@/core/config-store'
+import { passIt as passItImpl } from '@/core/passIt'
 
 function isServiceConfig(config: PassItConfig): config is ServiceConfig {
     return 'baseUrl' in config
@@ -33,26 +38,31 @@ function validateServiceConfig(config: ServiceConfig, name?: string): void {
     }
 }
 
-export function defineConfig(config: PassItConfig): PassItConfig {
+type PassItFn<TOptions> = (options: TOptions) => Promise<Response>
+
+export function defineConfig(
+    config: ServiceConfig,
+): { passIt: PassItFn<PassItOptionsSingle> }
+
+export function defineConfig<T extends Record<string, ServiceConfig>>(
+    config: T,
+): { passIt: PassItFn<PassItOptionsMulti<keyof T & string>> }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function defineConfig(config: PassItConfig): { passIt: PassItFn<any> } {
     if (isServiceConfig(config)) {
         validateServiceConfig(config)
     } else {
-        const services = config as Record<string, ServiceConfig>
-        for (const [name, serviceConfig] of Object.entries(services)) {
+        for (const [name, serviceConfig] of Object.entries(
+            config as Record<string, ServiceConfig>,
+        )) {
             validateServiceConfig(serviceConfig, name)
         }
     }
 
-    globalConfig = config
-    return config
-}
+    setConfig(config)
 
-export function getConfig(): PassItConfig | null {
-    return globalConfig
-}
-
-export function isMultiService(
-    config: PassItConfig
-): config is Record<string, ServiceConfig> {
-    return !('baseUrl' in config)
+    return {
+        passIt: passItImpl,
+    }
 }

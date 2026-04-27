@@ -7,7 +7,7 @@ export interface ForwardedRequest {
     searchParams: string
 }
 
-export function forwardRequest(req: NextRequest): ForwardedRequest {
+export async function forwardRequest(req: NextRequest): Promise<ForwardedRequest> {
     const method = req.method
 
     const headers: Record<string, string> = {}
@@ -21,7 +21,7 @@ export function forwardRequest(req: NextRequest): ForwardedRequest {
     const searchParams = req.nextUrl.searchParams.toString()
 
     const hasBody = !['GET', 'HEAD'].includes(method)
-    const body = hasBody ? JSON.stringify(req.body) : null
+    const body = hasBody ? await req.text() : null
 
     return {
         method,

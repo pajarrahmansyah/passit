@@ -34,7 +34,7 @@ describe('passIt', () => {
     beforeEach(() => {
         vi.clearAllMocks()
 
-        mocks.forwardRequest.mockReturnValue({
+        mocks.forwardRequest.mockResolvedValue({
             method: 'GET',
             headers: {},
             body: null,
@@ -51,7 +51,7 @@ describe('passIt', () => {
             normalize: true,
         })
 
-        mocks.forwardRequest.mockReturnValue({
+        mocks.forwardRequest.mockResolvedValue({
             method: 'GET',
             headers: {
                 'x-api-key': 'client-key',
@@ -82,6 +82,7 @@ describe('passIt', () => {
                 url: 'https://api.example.com/users?page=1',
                 method: 'GET',
                 headers: {
+                    // config header wins over client header
                     'x-api-key': 'server-key',
                     'x-user-id': '123',
                     'x-trace-id': 'trace-1',
@@ -102,6 +103,50 @@ describe('passIt', () => {
                 data: { users: [] },
             },
         })
+    })
+
+    it('route-level headers override config headers on the same key', async () => {
+        defineConfig({
+            baseUrl: 'https://api.example.com',
+            headers: {
+                'x-api-key': 'config-key',
+                'x-source': 'config',
+            },
+        })
+
+        mocks.forwardRequest.mockResolvedValue({
+            method: 'GET',
+            headers: {},
+            body: null,
+            searchParams: '',
+        })
+
+        mocks.fetchAdapter.mockResolvedValue({
+            status: 200,
+            headers: {},
+            data: {},
+            ok: true,
+        })
+
+        await passIt({
+            path: '/users',
+            req: {} as never,
+            headers: {
+                'x-api-key': 'route-key',
+            },
+        })
+
+        expect(mocks.fetchAdapter).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: {
+                    // route wins over config on conflict
+                    'x-api-key': 'route-key',
+                    // config-only header still present
+                    'x-source': 'config',
+                },
+            }),
+            expect.anything(),
+        )
     })
 
     it('uses the axios adapter for axios-backed services', async () => {
@@ -174,7 +219,7 @@ describe('passIt', () => {
             hooks,
         })
 
-        mocks.forwardRequest.mockReturnValue({
+        mocks.forwardRequest.mockResolvedValue({
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -229,7 +274,7 @@ describe('passIt', () => {
             hooks,
         })
 
-        mocks.forwardRequest.mockReturnValue({
+        mocks.forwardRequest.mockResolvedValue({
             method: 'POST',
             headers: {
                 'content-type': 'application/json',

@@ -84,21 +84,10 @@ export type PassItConfig =
     | ServiceConfig
     | Record<string, ServiceConfig>
 
-// Per-route options passed into passIt()
-//
-// Two usage patterns are supported:
-//
-//   Config-backed  — `service` resolves baseUrl (and other defaults) from defineConfig.
-//                    `baseUrl` is optional and overrides the configured value when set.
-//
-//   Direct         — no defineConfig involved; `baseUrl` is required at runtime.
-//                    `service` is not needed (and is ignored for single-service configs).
-//
-// Both `service` and `baseUrl` are optional at the type level because TypeScript cannot
-// know at compile time whether defineConfig was called with a single- or multi-service
-// config. The runtime validates and throws a descriptive error when neither resolves.
+// Base per-route options — no service routing concern here.
+// Use PassItOptionsSingle or PassItOptionsMulti<T> (returned by defineConfig)
+// for config-backed routes with compile-time service key enforcement.
 export interface PassItOptions {
-    service?: string
     baseUrl?: string
     path: string
     headers?: Record<string, string>
@@ -108,6 +97,19 @@ export interface PassItOptions {
     hooks?: HooksConfig & { override?: boolean }
     response?: (data: unknown) => unknown
     req?: NextRequest
+}
+
+// Typed passIt options returned by defineConfig — enforced at compile time
+//
+//   PassItOptionsSingle   — single-service config; `service` is not applicable
+//   PassItOptionsMulti<T> — multi-service config; `service` is required and
+//                           constrained to the exact keys registered in defineConfig
+export type PassItOptionsSingle = PassItOptions & {
+    service?: never
+}
+
+export type PassItOptionsMulti<TService extends string> = PassItOptions & {
+    service: TService
 }
 
 // Internal config after global and route options are merged

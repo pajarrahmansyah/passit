@@ -3,6 +3,8 @@ export { passIt } from '@/core/passIt'
 export type {
     PassItConfig,
     PassItOptions,
+    PassItOptionsSingle,
+    PassItOptionsMulti,
     ServiceConfig,
     ResolvedConfig,
     HooksConfig,
