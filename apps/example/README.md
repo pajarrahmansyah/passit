@@ -1,4 +1,4 @@
-# PassIt Next.js 15 Example
+# PassIt Demo Example
 
 A simple Next.js 15 App Router project that demonstrates the published
 `@pajarrahmansyah/passit` feature set with Tailwind CSS.
