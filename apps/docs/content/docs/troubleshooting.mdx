@@ -7,7 +7,17 @@ order: 8
 
 ## Config is not being used
 
-For Next.js 15, confirm `instrumentation.ts` exists at the project root.
+The most explicit fix is to import the config in the route and use the bound helper.
+
+```ts
+import passit from "@/passit.config";
+
+export async function GET(req: NextRequest) {
+  return passit.passIt({ path: "/users", req });
+}
+```
+
+If you use package-level `passIt`, confirm `instrumentation.ts` exists at the project root.
 
 ```ts
 export async function register() {
@@ -42,7 +52,7 @@ return passIt({
 
 ## Retries are not happening
 
-Retries only happen for statuses listed in `retry.onStatus`.
+Retries only happen for statuses listed in `retry.onStatus`, plus network errors and adapter exceptions.
 
 ```ts
 retry: {
@@ -50,3 +60,19 @@ retry: {
   onStatus: [500, 502, 503],
 }
 ```
+
+## Query params or body are missing upstream
+
+Pass `req` when the route depends on incoming client input.
+
+```ts
+export async function POST(req: NextRequest) {
+  return passIt({ path: "/users", req });
+}
+```
+
+If `req` is omitted, PassIt makes a server-initiated request and does not forward query params, body, or client headers.
+
+## HTML response becomes `null`
+
+PassIt consumes HTML responses and returns `null`. Use JSON or plain text upstream responses when the route needs to return content directly.

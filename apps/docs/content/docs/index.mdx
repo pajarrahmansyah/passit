@@ -22,19 +22,21 @@ export async function GET(req: NextRequest) {
 }
 ```
 
+Config lives in one place. Secrets stay server-side. Route handlers stay small.
+
 ## What PassIt handles
 
 - Proxying client requests to your real backend securely.
 - Keeping API keys and backend URLs server-side only.
-- Forwarding query params, request body, and dynamic headers.
-- Merging headers with PassIt route headers winning on conflicts.
+- Auto-forwarding query params, request body, and dynamic headers when `req` is provided.
+- Merging headers with PassIt config/route headers winning on conflicts.
 - Timeout handling with per-route override.
-- Retry logic on server errors only.
+- Retry logic on configured `onStatus` codes, network errors, and adapter exceptions.
 - Response normalization into a consistent success/error shape.
-- Content-Type detection for JSON, plain text, and HTML.
+- Content-Type detection for JSON and plain text. HTML responses are consumed and returned as `null`.
 - Logging hooks with dev/prod separation.
 - `fetch` and optional `axios` support.
 
 ## What PassIt does not handle
 
-PassIt does not replace client-side data fetching, configure CORS, or handle infrastructure concerns like rate limiting, SSL, load balancing, and WAF rules.
+PassIt does not replace client-side data fetching, configure CORS, or handle infrastructure concerns like rate limiting, SSL, load balancing, and WAF rules. It is App Router-only for now.

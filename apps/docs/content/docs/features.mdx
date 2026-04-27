@@ -26,7 +26,7 @@ return passIt({
 
 ## Retries
 
-Retries run only on configured server error statuses.
+Retries run on configured `onStatus` codes. Any status code is valid. Retries also run on network errors and adapter exceptions.
 
 ```ts
 retry: {
@@ -34,6 +34,8 @@ retry: {
   onStatus: [500, 502, 503],
 }
 ```
+
+PassIt never guesses which status codes are retryable. Put every retryable status in `onStatus`.
 
 ## Normalization
 
@@ -67,3 +69,13 @@ hooks: {
   },
 }
 ```
+
+## Content types
+
+PassIt detects backend response content types:
+
+- JSON is parsed and returned as data.
+- Plain text is returned as text.
+- HTML is consumed and returned as `null`.
+
+Use a route `response` transformer when your frontend needs a custom shape.

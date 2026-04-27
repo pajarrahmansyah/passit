@@ -11,6 +11,14 @@ PassIt runs inside Route Handlers. The browser knows only your local route, such
 
 Do not import PassIt config into Client Components. Keep `passit.config.ts`, credentials, and backend service URLs server-side.
 
+```txt
+Client browser          Next.js server
+-------------           -------------------------------
+/api/users       ->     https://real-backend-api.com/users
+                        x-api-key: secret
+                        PassIt config and proxy logic
+```
+
 ## Environment variables
 
 Use server variables:
@@ -38,3 +46,10 @@ export async function GET(req: NextRequest) {
   return passIt({ path: "/users/me", req });
 }
 ```
+
+## What remains your responsibility
+
+- Client-side data fetching strategy.
+- CORS and hosting configuration.
+- Rate limiting, WAF rules, SSL, and load balancing.
+- Per-route authorization before calling `passIt`.

@@ -8,6 +8,9 @@ order: 4
 ## Basic GET
 
 ```ts
+import { passIt } from "@pajarrahmansyah/passit";
+import type { NextRequest } from "next/server";
+
 export async function GET(req: NextRequest) {
   return passIt({ path: "/users", req });
 }
@@ -18,6 +21,18 @@ PassIt forwards query parameters:
 ```txt
 /api/users?page=2 -> https://api.backend.com/users?page=2
 ```
+
+## Server-initiated routes
+
+Omit `req` only when the upstream call does not depend on query params, request body, or client headers.
+
+```ts
+export async function GET() {
+  return passIt({ path: "/health" });
+}
+```
+
+If your route accepts a `NextRequest`, pass it to PassIt unless you intentionally want to drop client input.
 
 ## Mutations
 
@@ -58,3 +73,16 @@ return passIt({
 ```
 
 If `normalize` and `response` are both defined, `response` receives normalized data. Set `normalize: false` when you need raw backend data.
+
+## Typed config route
+
+You can also import the config and use the typed `passIt` returned by `defineConfig`.
+
+```ts
+import passit from "@/passit.config";
+import type { NextRequest } from "next/server";
+
+export async function GET(req: NextRequest) {
+  return passit.passIt({ service: "auth", path: "/users/me", req });
+}
+```

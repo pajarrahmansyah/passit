@@ -8,7 +8,7 @@ order: 6
 ## Exports
 
 ```ts
-import { defineConfig, passIt } from "@pajarrahmansyah/passit";
+import { createPassIt, defineConfig, passIt } from "@pajarrahmansyah/passit";
 import { withPassIt } from "@pajarrahmansyah/passit/next";
 ```
 
@@ -24,12 +24,18 @@ import { withPassIt } from "@pajarrahmansyah/passit/next";
 | `normalize` | `boolean \| NormalizeConfig` | No | None | Normalize success and/or errors. |
 | `hooks` | `HooksConfig` | No | None | Logging and observability hooks. |
 
+`defineConfig(config)` validates the config, registers it globally for package-level `passIt`, and returns a typed `{ passIt }` helper bound to that config.
+
+## `createPassIt`
+
+`createPassIt(config)` accepts the same config shape as `defineConfig`, but does not register it globally. Use it when you want explicit config ownership.
+
 ## `passIt`
 
 | Option | Type | Required | Description |
 | --- | --- | --- | --- |
 | `path` | `string` | Yes | Backend endpoint path. |
-| `req` | `NextRequest` | Yes | Incoming Next.js request object. |
+| `req` | `NextRequest` | No | Incoming Next.js request object. Pass it to forward query params, body, and client headers. |
 | `service` | `string` | No | Service key for multi-service config. |
 | `baseUrl` | `string` | No | Route-level base URL override. |
 | `headers` | `Record<string, string>` | No | Extra headers for this route. |
@@ -37,11 +43,31 @@ import { withPassIt } from "@pajarrahmansyah/passit/next";
 | `retry` | `RetryConfig` | No | Route retry override. |
 | `normalize` | `boolean \| NormalizeConfig` | No | Route normalization override. |
 | `hooks` | `HooksConfig & { override?: boolean }` | No | Route-level hooks. |
-| `response` | `(data: unknown) => unknown` | No | Transform data after normalization. |
+| `response` | `(data: unknown) => unknown` | No | Transform data after normalization. Set `normalize: false` when the transformer needs raw upstream data. |
+
+## Forwarding switch
+
+`req` is optional. Passing it tells PassIt to forward client input.
+
+```ts
+export async function GET(req: NextRequest) {
+  return passIt({ path: "/users", req });
+}
+```
+
+Omitting it creates a server-initiated request with no forwarded query params, body, or client headers.
+
+```ts
+export async function GET() {
+  return passIt({ path: "/health" });
+}
+```
 
 ## Types
 
 ```ts
+type HttpLib = "fetch" | "axios";
+
 type RetryConfig = {
   times: number;
   onStatus: number[];
@@ -50,5 +76,42 @@ type RetryConfig = {
 type NormalizeConfig = {
   success?: boolean;
   error?: boolean;
+};
+
+type NormalizedSuccess<T = unknown> = {
+  success: true;
+  status: number;
+  data: T;
+};
+
+type NormalizedError = {
+  success: false;
+  status: number;
+  message: string;
+};
+```
+
+`RetryConfig.onStatus` accepts any status codes you choose. Retry also fires on network errors and adapter exceptions.
+
+## Hook payloads
+
+```ts
+type HookRequest = {
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  path: string;
+  headers: Record<string, string>;
+};
+
+type HookResponse = {
+  status: number;
+  path: string;
+  data: unknown;
+  duration: number;
+};
+
+type HookError = {
+  status: number;
+  path: string;
+  message: string;
 };
 ```

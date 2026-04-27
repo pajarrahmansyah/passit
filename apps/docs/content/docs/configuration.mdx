@@ -22,6 +22,8 @@ export default defineConfig({
 ## Multiple services
 
 ```ts
+import { defineConfig } from "@pajarrahmansyah/passit";
+
 export default defineConfig({
   auth: {
     baseUrl: "https://auth.backend.com",
@@ -106,9 +108,10 @@ This works, but instrumentation is cleaner because config loading is not tied to
 
 ### Plugin option
 
-You can also wrap your Next.js config with PassIt.
+You can also wrap your Next.js config with PassIt. This enables the instrumentation hook automatically for Next.js 14. Pair it with a one-line `instrumentation.ts`.
 
 ```ts
+// next.config.ts
 import { withPassIt } from "@pajarrahmansyah/passit/next";
 
 export default withPassIt({
@@ -116,4 +119,37 @@ export default withPassIt({
 });
 ```
 
+```ts
+// instrumentation.ts
+export { register } from "@pajarrahmansyah/passit/next";
+```
+
 Pick only one loading method. For most Next.js 15 projects, use `instrumentation.ts`.
+
+## Route-safe config import
+
+For the strongest typing and most predictable route loading, import your config object in the route and use the bound `passIt` function returned by `defineConfig`.
+
+```ts
+// app/api/login/route.ts
+import passit from "@/passit.config";
+import type { NextRequest } from "next/server";
+
+export async function POST(req: NextRequest) {
+  return passit.passIt({ service: "auth", path: "/login", req });
+}
+```
+
+## `createPassIt`
+
+Use `createPassIt(config)` when you want a typed `passIt` function bound to a config without registering it globally.
+
+```ts
+import { createPassIt } from "@pajarrahmansyah/passit";
+
+const api = createPassIt({
+  baseUrl: "https://api.backend.com",
+});
+
+export const passIt = api.passIt;
+```

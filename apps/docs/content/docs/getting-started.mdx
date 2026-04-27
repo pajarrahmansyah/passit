@@ -34,7 +34,21 @@ export default defineConfig({
 
 ## Load the config
 
-For Next.js 15, create `instrumentation.ts` at your project root.
+The most route-safe setup is to import your config in the route and use the typed `passIt` function returned by `defineConfig`.
+
+```ts
+// app/api/users/route.ts
+import passit from "@/passit.config";
+import type { NextRequest } from "next/server";
+
+export async function GET(req: NextRequest) {
+  return passit.passIt({ path: "/users", req });
+}
+```
+
+This avoids relying on server startup module order.
+
+If you prefer importing package-level `passIt`, load your config once during server startup. For Next.js 15, create `instrumentation.ts` at your project root.
 
 ```ts
 export async function register() {
@@ -42,7 +56,7 @@ export async function register() {
 }
 ```
 
-## Use it in a route
+## Use package-level `passIt`
 
 ```ts
 import { passIt } from "@pajarrahmansyah/passit";
@@ -57,3 +71,5 @@ export async function GET(req: NextRequest) {
 ```
 
 Your client calls `/api/users`. PassIt forwards that request to `https://api.backend.com/users`.
+
+Pass `req` when query params, request bodies, or client headers should be forwarded. Omit `req` only for server-initiated routes that do not depend on client input.
