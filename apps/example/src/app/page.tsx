@@ -120,8 +120,6 @@ export default function Home() {
             <a
               className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--muted)] transition hover:text-foreground"
               href={docsUrl}
-              target="_blank"
-              rel="noreferrer"
             >
               docs
             </a>
@@ -131,8 +129,6 @@ export default function Home() {
             <a
               className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--muted)] transition hover:text-foreground"
               href="https://github.com/pajarrahmansyah/passit"
-              target="_blank"
-              rel="noreferrer"
             >
               github
             </a>
