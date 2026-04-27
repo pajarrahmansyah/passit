@@ -4,8 +4,8 @@ import type {
     PassItOptionsMulti,
     ServiceConfig,
 } from '@/core/types'
-import { setConfig, isMultiService } from '@/core/config-store'
-import { passIt as passItImpl } from '@/core/passIt'
+import { setConfig } from '@/core/config-store'
+import { passItWithConfig } from '@/core/passIt'
 
 function isServiceConfig(config: PassItConfig): config is ServiceConfig {
     return 'baseUrl' in config
@@ -40,16 +40,19 @@ function validateServiceConfig(config: ServiceConfig, name?: string): void {
 
 type PassItFn<TOptions> = (options: TOptions) => Promise<Response>
 
-export function defineConfig(
+export function createPassIt(
     config: ServiceConfig,
 ): { passIt: PassItFn<PassItOptionsSingle> }
 
-export function defineConfig<T extends Record<string, ServiceConfig>>(
+export function createPassIt<T extends Record<string, ServiceConfig>>(
     config: T,
 ): { passIt: PassItFn<PassItOptionsMulti<keyof T & string>> }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function defineConfig(config: PassItConfig): { passIt: PassItFn<any> } {
+export function createPassIt(config: PassItConfig): { passIt: PassItFn<any> }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createPassIt(config: PassItConfig): { passIt: PassItFn<any> } {
     if (isServiceConfig(config)) {
         validateServiceConfig(config)
     } else {
@@ -60,9 +63,24 @@ export function defineConfig(config: PassItConfig): { passIt: PassItFn<any> } {
         }
     }
 
+    return {
+        passIt: (options) => passItWithConfig(options, config),
+    }
+}
+
+export function defineConfig(
+    config: ServiceConfig,
+): { passIt: PassItFn<PassItOptionsSingle> }
+
+export function defineConfig<T extends Record<string, ServiceConfig>>(
+    config: T,
+): { passIt: PassItFn<PassItOptionsMulti<keyof T & string>> }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function defineConfig(config: PassItConfig): { passIt: PassItFn<any> } {
+    const passItConfig = createPassIt(config)
+
     setConfig(config)
 
-    return {
-        passIt: passItImpl,
-    }
+    return passItConfig
 }

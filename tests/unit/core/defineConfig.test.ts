@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { defineConfig } from '@/core/defineConfig'
 import { getConfig } from '@/core/config-store'
 
@@ -11,6 +11,17 @@ describe('defineConfig', () => {
     it('stores single service config', () => {
         defineConfig({ baseUrl: 'https://api.example.com' })
         expect(getConfig()).toMatchObject({ baseUrl: 'https://api.example.com' })
+    })
+
+    it('stores config on globalThis across module reloads', async () => {
+        defineConfig({ baseUrl: 'https://reload.example.com' })
+
+        vi.resetModules()
+        const { getConfig: getReloadedConfig } = await import('@/core/config-store')
+
+        expect(getReloadedConfig()).toMatchObject({
+            baseUrl: 'https://reload.example.com',
+        })
     })
 
     it('stores multi service config', () => {

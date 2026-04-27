@@ -1,4 +1,4 @@
-export { defineConfig } from '@/core/defineConfig'
+export { createPassIt, defineConfig } from '@/core/defineConfig'
 export { passIt } from '@/core/passIt'
 export type {
     PassItConfig,

@@ -2,6 +2,11 @@
 src/
 tests/
 scripts/
+apps/
+node_modules/
+.git/
+.next/
+coverage/
 AGENTS.md
 CLAUDE.md
 tsconfig.json

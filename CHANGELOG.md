@@ -5,6 +5,7 @@ All notable changes to PassIt will be documented here.
 ## [0.0.1] - 2026-04-27
 
 ### Added
+- `createPassIt(config)` factory for route-safe config binding without relying on global registration
 - `PassItOptionsSingle` and `PassItOptionsMulti<TService>` exported types — enforces `service` key at compile time based on what was passed to `defineConfig`
 - `defineConfig` now returns a typed `passIt` function: single-service configs produce `PassItOptionsSingle` (no `service` allowed), multi-service configs produce `PassItOptionsMulti<keyof T>` (`service` required and constrained to registered keys)
 - New `src/core/config-store.ts` module — owns the global config singleton (`setConfig`, `getConfig`, `isMultiService`) to eliminate the circular dependency between `defineConfig` and `passIt`
@@ -17,6 +18,7 @@ All notable changes to PassIt will be documented here.
 - `src/next/plugin.ts` — implemented `withPassIt` Next.js config wrapper (enables `instrumentationHook` for Next.js 14 compatibility) and `register` export for `instrumentation.ts` that auto-imports `passit.config` at server startup
 
 ### Fixed
+- Config registered by `instrumentation.ts` now uses `globalThis` storage so App Router route handlers can resolve it across separate server module graphs
 - ESM consumers importing from `@pajarrahmansyah/passit` would silently receive `.mjs` bundles in some toolchains — resolved by pinning output extensions in `tsup.config.ts`
 - Request body was serialised as `"[object ReadableStream]"` when proxying POST/PUT/PATCH — resolved by awaiting `req.text()`
 - Route-level headers were being overridden by global config headers instead of the reverse

@@ -27,7 +27,7 @@ vi.mock('@/features/hooks', () => ({
     runErrorHooks: mocks.runErrorHooks,
 }))
 
-import { defineConfig } from '@/core/defineConfig'
+import { createPassIt, defineConfig } from '@/core/defineConfig'
 import { passIt } from '@/core/passIt'
 
 describe('passIt', () => {
@@ -184,6 +184,36 @@ describe('passIt', () => {
         )
         expect(mocks.fetchAdapter).not.toHaveBeenCalled()
         expect(await response.json()).toEqual({ ok: true })
+    })
+
+    it('uses factory-bound config instead of the global config', async () => {
+        const { passIt: boundPassIt } = createPassIt({
+            baseUrl: 'https://bound.example.com',
+        })
+
+        defineConfig({
+            baseUrl: 'https://global.example.com',
+        })
+
+        mocks.fetchAdapter.mockResolvedValue({
+            status: 200,
+            headers: {},
+            data: { ok: true },
+            ok: true,
+        })
+
+        await boundPassIt({
+            path: '/users',
+        })
+
+        expect(mocks.fetchAdapter).toHaveBeenCalledWith(
+            expect.objectContaining({
+                url: 'https://bound.example.com/users',
+            }),
+            expect.objectContaining({
+                baseUrl: 'https://bound.example.com',
+            }),
+        )
     })
 
     it('rejects when multiple services are configured without a service key', async () => {

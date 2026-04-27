@@ -1,13 +1,21 @@
 import type { PassItConfig, ServiceConfig } from '@/core/types'
 
-let globalConfig: PassItConfig | null = null
+const CONFIG_KEY = '__PASSIT_CONFIG__'
+
+type PassItGlobal = typeof globalThis & {
+    [CONFIG_KEY]?: PassItConfig | null
+}
+
+function getStore(): PassItGlobal {
+    return globalThis as PassItGlobal
+}
 
 export function setConfig(config: PassItConfig): void {
-    globalConfig = config
+    getStore()[CONFIG_KEY] = config
 }
 
 export function getConfig(): PassItConfig | null {
-    return globalConfig
+    return getStore()[CONFIG_KEY] ?? null
 }
 
 export function isMultiService(

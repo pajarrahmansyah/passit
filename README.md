@@ -121,6 +121,24 @@ export default defineConfig({
 
 ### Step 3 — Load your config
 
+For the most route-safe setup, import the config object in your Route Handler and
+use the typed `passIt` function returned by `defineConfig`. This avoids relying on
+server startup module order.
+
+```ts
+// app/api/users/route.ts
+import passit from '@/passit.config'
+import { NextRequest } from 'next/server'
+
+export async function GET(req: NextRequest) {
+  return passit.passIt({ path: '/users', req })
+}
+```
+
+If you prefer the package-level `passIt` import, load your config once during
+server startup. PassIt stores that registration on `globalThis` so it can survive
+separate server module graphs in Next.js App Router.
+
 Choose ONE of these options:
 
 **Option 1 — instrumentation.ts (Recommended, Next.js 15+)**
@@ -274,6 +292,9 @@ export default defineConfig({
 | `retry` | `RetryConfig` | no | — | Retry on failure |
 | `normalize` | `boolean \| NormalizeConfig` | no | — | Normalize response shape |
 | `hooks` | `HooksConfig` | no | — | Logging and observability |
+
+`createPassIt(config)` accepts the same config shape and returns a typed
+`passIt` function bound to that config without registering it globally.
 
 ### passIt options
 

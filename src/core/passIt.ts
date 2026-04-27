@@ -3,6 +3,7 @@ import { getConfig, isMultiService } from '@/core/config-store'
 import type {
     PassItOptionsSingle,
     PassItOptionsMulti,
+    PassItConfig,
     ResolvedConfig,
     ServiceConfig,
     HooksConfig,
@@ -18,9 +19,10 @@ import { runRequestHooks, runResponseHooks, runErrorHooks } from '@/features/hoo
 
 type PassItOptionsAll = PassItOptionsSingle | PassItOptionsMulti<string>
 
-function resolveServiceConfig(options: PassItOptionsAll): ServiceConfig {
-    const config = getConfig()
-
+function resolveServiceConfig(
+    options: PassItOptionsAll,
+    config: PassItConfig | null,
+): ServiceConfig {
     if (!config) {
         throw new Error(
             '[PassIt] Config not found. Did you forget to import your passit.config.ts?\n\nSee setup guide: https://github.com/pajarrahmansyah/passit'
@@ -94,8 +96,11 @@ function mergeHooks(
     }
 }
 
-export async function passIt(options: PassItOptionsAll): Promise<Response> {
-    const serviceConfig = resolveServiceConfig(options)
+export async function passItWithConfig(
+    options: PassItOptionsAll,
+    config: PassItConfig | null,
+): Promise<Response> {
+    const serviceConfig = resolveServiceConfig(options, config)
     const resolved = buildResolvedConfig(serviceConfig, options)
 
     const forwarded = options.req
@@ -169,4 +174,8 @@ export async function passIt(options: PassItOptionsAll): Promise<Response> {
             { status }
         )
     }
+}
+
+export async function passIt(options: PassItOptionsAll): Promise<Response> {
+    return passItWithConfig(options, getConfig())
 }
