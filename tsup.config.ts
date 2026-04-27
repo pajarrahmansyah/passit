@@ -9,6 +9,9 @@ export default defineConfig({
         '@': './src',
     },
     format: ['cjs', 'esm'],
+    outExtension({ format }) {
+        return { js: format === 'cjs' ? '.cjs' : '.js' }
+    },
     dts: false,
     clean: true,
     sourcemap: true,

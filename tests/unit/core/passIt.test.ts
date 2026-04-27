@@ -75,7 +75,7 @@ describe('passIt', () => {
                 'x-trace-id': 'trace-1',
             },
             response: (data: unknown) => ({ wrapped: data }),
-        } as never)
+        })
 
         expect(mocks.fetchAdapter).toHaveBeenCalledWith(
             {
@@ -122,7 +122,7 @@ describe('passIt', () => {
         const response = await passIt({
             service: 'auth',
             path: 'login',
-        } as never)
+        })
 
         expect(mocks.forwardRequest).not.toHaveBeenCalled()
         expect(mocks.axiosAdapter).toHaveBeenCalledWith(
@@ -154,7 +154,7 @@ describe('passIt', () => {
         await expect(
             passIt({
                 path: '/users',
-            } as never),
+            }),
         ).rejects.toThrow(
             '[PassIt] Multiple services detected. Provide a "service" key in passIt() options.',
         )
@@ -193,7 +193,7 @@ describe('passIt', () => {
         await passIt({
             path: '/users',
             req: {} as never,
-        } as never)
+        })
 
         expect(mocks.runRequestHooks).toHaveBeenCalledWith(
             hooks,
@@ -243,7 +243,7 @@ describe('passIt', () => {
         const response = await passIt({
             path: '/users',
             req: {} as never,
-        } as never)
+        })
 
         expect(mocks.runErrorHooks).toHaveBeenCalledWith(
             hooks,

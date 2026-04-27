@@ -85,10 +85,22 @@ export type PassItConfig =
     | Record<string, ServiceConfig>
 
 // Per-route options passed into passIt()
+//
+// Two usage patterns are supported:
+//
+//   Config-backed  — `service` resolves baseUrl (and other defaults) from defineConfig.
+//                    `baseUrl` is optional and overrides the configured value when set.
+//
+//   Direct         — no defineConfig involved; `baseUrl` is required at runtime.
+//                    `service` is not needed (and is ignored for single-service configs).
+//
+// Both `service` and `baseUrl` are optional at the type level because TypeScript cannot
+// know at compile time whether defineConfig was called with a single- or multi-service
+// config. The runtime validates and throws a descriptive error when neither resolves.
 export interface PassItOptions {
-    baseUrl: string
-    path: string
     service?: string
+    baseUrl?: string
+    path: string
     headers?: Record<string, string>
     timeout?: number | false
     retry?: RetryConfig

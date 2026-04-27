@@ -13,19 +13,19 @@
     "url": "https://github.com/pajarrahmansyah/passit/issues"
   },
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
     },
     "./next": {
       "types": "./dist/next/plugin.d.ts",
-      "require": "./dist/next/plugin.js",
-      "import": "./dist/next/plugin.mjs"
+      "require": "./dist/next/plugin.cjs",
+      "import": "./dist/next/plugin.js"
     }
   },
   "scripts": {
