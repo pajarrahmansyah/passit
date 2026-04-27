@@ -1,0 +1,59 @@
+---
+title: "Getting Started"
+description: "Install PassIt, define your first config, load it in Next.js 15, and proxy your first route."
+section: "Start"
+order: 2
+---
+
+## Install
+
+```bash
+npm install @pajarrahmansyah/passit
+```
+
+For optional Axios support:
+
+```bash
+npm install axios
+```
+
+## Create your config
+
+Create `passit.config.ts` at your project root.
+
+```ts
+import { defineConfig } from "@pajarrahmansyah/passit";
+
+export default defineConfig({
+  baseUrl: "https://api.backend.com",
+  headers: {
+    "x-api-key": process.env.API_KEY,
+  },
+});
+```
+
+## Load the config
+
+For Next.js 15, create `instrumentation.ts` at your project root.
+
+```ts
+export async function register() {
+  await import("./passit.config");
+}
+```
+
+## Use it in a route
+
+```ts
+import { passIt } from "@pajarrahmansyah/passit";
+import type { NextRequest } from "next/server";
+
+export async function GET(req: NextRequest) {
+  return passIt({
+    path: "/users",
+    req,
+  });
+}
+```
+
+Your client calls `/api/users`. PassIt forwards that request to `https://api.backend.com/users`.

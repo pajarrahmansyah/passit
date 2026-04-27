@@ -1,0 +1,60 @@
+---
+title: "Route Handlers"
+description: "Use passIt inside App Router API routes for reads, writes, dynamic paths, and service-specific forwarding."
+section: "Core"
+order: 4
+---
+
+## Basic GET
+
+```ts
+export async function GET(req: NextRequest) {
+  return passIt({ path: "/users", req });
+}
+```
+
+PassIt forwards query parameters:
+
+```txt
+/api/users?page=2 -> https://api.backend.com/users?page=2
+```
+
+## Mutations
+
+```ts
+export async function POST(req: NextRequest) {
+  return passIt({ path: "/users", req });
+}
+
+export async function PATCH(req: NextRequest) {
+  return passIt({ path: "/users/profile", req });
+}
+```
+
+## Dynamic routes
+
+```ts
+type Params = {
+  params: Promise<{ id: string }>;
+};
+
+export async function GET(req: NextRequest, { params }: Params) {
+  const { id } = await params;
+  return passIt({ path: `/users/${id}`, req });
+}
+```
+
+## Response transform
+
+```ts
+return passIt({
+  path: "/users",
+  req,
+  response: (data) => ({
+    users: data.results,
+    total: data.count,
+  }),
+});
+```
+
+If `normalize` and `response` are both defined, `response` receives normalized data. Set `normalize: false` when you need raw backend data.

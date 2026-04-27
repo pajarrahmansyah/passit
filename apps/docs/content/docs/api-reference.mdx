@@ -1,0 +1,54 @@
+---
+title: "API Reference"
+description: "Reference exported functions, route options, config types, retry settings, normalization settings, and hook payloads."
+section: "Reference"
+order: 6
+---
+
+## Exports
+
+```ts
+import { defineConfig, passIt } from "@pajarrahmansyah/passit";
+import { withPassIt } from "@pajarrahmansyah/passit/next";
+```
+
+## `defineConfig`
+
+| Option | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `baseUrl` | `string` | Yes | None | Real backend base URL, no trailing slash. |
+| `http` | `"fetch" \| "axios"` | No | `"fetch"` | HTTP adapter. |
+| `headers` | `Record<string, string>` | No | `{}` | Static headers injected on every request. |
+| `timeout` | `number \| false` | No | `5000` | Timeout in milliseconds. |
+| `retry` | `RetryConfig` | No | None | Retry policy. |
+| `normalize` | `boolean \| NormalizeConfig` | No | None | Normalize success and/or errors. |
+| `hooks` | `HooksConfig` | No | None | Logging and observability hooks. |
+
+## `passIt`
+
+| Option | Type | Required | Description |
+| --- | --- | --- | --- |
+| `path` | `string` | Yes | Backend endpoint path. |
+| `req` | `NextRequest` | Yes | Incoming Next.js request object. |
+| `service` | `string` | No | Service key for multi-service config. |
+| `baseUrl` | `string` | No | Route-level base URL override. |
+| `headers` | `Record<string, string>` | No | Extra headers for this route. |
+| `timeout` | `number \| false` | No | Route timeout override. |
+| `retry` | `RetryConfig` | No | Route retry override. |
+| `normalize` | `boolean \| NormalizeConfig` | No | Route normalization override. |
+| `hooks` | `HooksConfig & { override?: boolean }` | No | Route-level hooks. |
+| `response` | `(data: unknown) => unknown` | No | Transform data after normalization. |
+
+## Types
+
+```ts
+type RetryConfig = {
+  times: number;
+  onStatus: number[];
+};
+
+type NormalizeConfig = {
+  success?: boolean;
+  error?: boolean;
+};
+```

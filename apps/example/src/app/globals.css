@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --background: #121411;
+  --foreground: #f6f3ea;
+  --muted: #a5a093;
+  --panel: #1d211b;
+  --line: #3b4236;
+  --ink: #080907;
+  --acid: #d7ff42;
+  --rust: #ff704d;
+  --teal: #37c7bd;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --background: #f6f3ea;
+  --foreground: #161713;
+  --muted: #706b60;
+  --panel: #fffdf6;
+  --line: #d8d0bf;
+  --ink: #161713;
+  --acid: #d7ff42;
+  --rust: #b84a2f;
+  --teal: #0f7b78;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--acid);
+  color: var(--ink);
+}
+
+:where(a, button:not(:disabled), summary, [role="button"]:not([aria-disabled="true"])) {
+  cursor: pointer;
+}
+
+.grain {
+  background-image:
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--acid) 18%, transparent), transparent 24rem),
+    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--teal) 16%, transparent), transparent 22rem),
+    linear-gradient(color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+}
+
+.console-scroll {
+  scrollbar-color: var(--acid) #11120f;
+  scrollbar-width: thin;
+}
+
+.console-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.console-scroll::-webkit-scrollbar-track {
+  background: #11120f;
+  border-top: 1px solid rgba(246, 243, 234, 0.18);
+}
+
+.console-scroll::-webkit-scrollbar-thumb {
+  background: var(--acid);
+  border: 2px solid #11120f;
+}
+
+.console-scroll::-webkit-scrollbar-corner {
+  background: #11120f;
+}

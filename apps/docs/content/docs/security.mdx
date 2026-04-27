@@ -1,0 +1,40 @@
+---
+title: "Security Model"
+description: "Understand what PassIt protects, what remains your responsibility, and how to avoid leaking backend credentials."
+section: "Guides"
+order: 7
+---
+
+## Server-only boundary
+
+PassIt runs inside Route Handlers. The browser knows only your local route, such as `/api/users`. The server knows the real backend URL and API keys.
+
+Do not import PassIt config into Client Components. Keep `passit.config.ts`, credentials, and backend service URLs server-side.
+
+## Environment variables
+
+Use server variables:
+
+```bash
+API_KEY="secret"
+AUTH_KEY="secret"
+STORAGE_KEY="secret"
+```
+
+Do not use `NEXT_PUBLIC_` for backend credentials.
+
+## Authorization
+
+PassIt forwards requests. It does not decide whether your user is allowed to call a route.
+
+```ts
+export async function GET(req: NextRequest) {
+  const session = await getSession();
+
+  if (!session) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  return passIt({ path: "/users/me", req });
+}
+```

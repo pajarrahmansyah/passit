@@ -1,0 +1,52 @@
+---
+title: "Troubleshooting"
+description: "Fix common setup issues around config loading, missing environment variables, adapters, retries, and response transforms."
+section: "Support"
+order: 8
+---
+
+## Config is not being used
+
+For Next.js 15, confirm `instrumentation.ts` exists at the project root.
+
+```ts
+export async function register() {
+  await import("./passit.config");
+}
+```
+
+## Environment variables are undefined
+
+Check `.env.local` or your hosting provider settings, then restart the dev server.
+
+## Axios adapter fails
+
+Install Axios when using `http: "axios"`.
+
+```bash
+npm install axios
+```
+
+## Transformer gets normalized data
+
+`response` runs after `normalize`. Disable normalization when the transformer needs raw upstream data.
+
+```ts
+return passIt({
+  path: "/users",
+  req,
+  normalize: false,
+  response: (data) => data,
+});
+```
+
+## Retries are not happening
+
+Retries only happen for statuses listed in `retry.onStatus`.
+
+```ts
+retry: {
+  times: 2,
+  onStatus: [500, 502, 503],
+}
+```

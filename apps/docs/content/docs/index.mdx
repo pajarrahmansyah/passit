@@ -1,0 +1,40 @@
+---
+title: "PassIt Documentation"
+description: "Build clean Next.js App Router proxy routes with server-only secrets, retries, timeouts, normalization, and hooks."
+section: "Start"
+order: 1
+---
+
+PassIt is a config-driven proxy gateway for Next.js App Router Route Handlers. It sits between your client and your real backend, handling auth headers, retries, timeouts, error normalization, and logging.
+
+```txt
+Client -> Route Handler (PassIt) -> Real Backend
+```
+
+With PassIt, repeated proxy route boilerplate becomes a small route handler:
+
+```ts
+import { passIt } from "@pajarrahmansyah/passit";
+import type { NextRequest } from "next/server";
+
+export async function GET(req: NextRequest) {
+  return passIt({ path: "/users", req });
+}
+```
+
+## What PassIt handles
+
+- Proxying client requests to your real backend securely.
+- Keeping API keys and backend URLs server-side only.
+- Forwarding query params, request body, and dynamic headers.
+- Merging headers with PassIt route headers winning on conflicts.
+- Timeout handling with per-route override.
+- Retry logic on server errors only.
+- Response normalization into a consistent success/error shape.
+- Content-Type detection for JSON, plain text, and HTML.
+- Logging hooks with dev/prod separation.
+- `fetch` and optional `axios` support.
+
+## What PassIt does not handle
+
+PassIt does not replace client-side data fetching, configure CORS, or handle infrastructure concerns like rate limiting, SSL, load balancing, and WAF rules.

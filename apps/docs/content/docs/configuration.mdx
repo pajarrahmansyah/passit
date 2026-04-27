@@ -1,0 +1,119 @@
+---
+title: "Configuration"
+description: "Configure single and multi-service gateways, headers, adapters, timeouts, retries, normalization, and hooks."
+section: "Core"
+order: 3
+---
+
+## Single service
+
+```ts
+import { defineConfig } from "@pajarrahmansyah/passit";
+
+export default defineConfig({
+  baseUrl: "https://api.backend.com",
+  headers: {
+    "x-api-key": process.env.API_KEY,
+  },
+  timeout: 5000,
+});
+```
+
+## Multiple services
+
+```ts
+export default defineConfig({
+  auth: {
+    baseUrl: "https://auth.backend.com",
+    headers: { "x-api-key": process.env.AUTH_KEY },
+  },
+  storage: {
+    baseUrl: "https://storage.backend.com",
+    headers: { "x-api-key": process.env.STORAGE_KEY },
+  },
+});
+```
+
+Use the service key in route handlers:
+
+```ts
+return passIt({ service: "auth", path: "/login", req });
+```
+
+## Adapters
+
+PassIt defaults to `fetch`.
+
+```ts
+http: "fetch"
+```
+
+Use Axios when installed:
+
+```ts
+http: "axios"
+```
+
+## Loading options
+
+PassIt needs your `passit.config.ts` file to be imported once by the server before route handlers call `passIt`.
+
+### Recommended: Next.js 15+
+
+Create `instrumentation.ts` at your project root, next to `passit.config.ts`.
+
+```ts
+export async function register() {
+  await import("./passit.config");
+}
+```
+
+Use this for new App Router projects. It keeps the config server-only and avoids importing setup code inside pages, layouts, or every route.
+
+### Next.js 14
+
+Enable the instrumentation hook first.
+
+```ts
+// next.config.ts
+const nextConfig = {
+  experimental: {
+    instrumentationHook: true,
+  },
+};
+
+export default nextConfig;
+```
+
+Then add the same `instrumentation.ts` file.
+
+```ts
+export async function register() {
+  await import("./passit.config");
+}
+```
+
+### Simple fallback: layout import
+
+If you do not want to use instrumentation, import the config once in your root layout.
+
+```ts
+// app/layout.tsx
+import "@/passit.config";
+```
+
+This works, but instrumentation is cleaner because config loading is not tied to UI layout files.
+
+### Plugin option
+
+You can also wrap your Next.js config with PassIt.
+
+```ts
+import { withPassIt } from "@pajarrahmansyah/passit/next";
+
+export default withPassIt({
+  // Next.js config
+});
+```
+
+Pick only one loading method. For most Next.js 15 projects, use `instrumentation.ts`.

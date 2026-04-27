@@ -1,0 +1,69 @@
+---
+title: "Feature Guide"
+description: "Apply timeouts, retries, normalized responses, hooks, and route overrides without rewriting proxy boilerplate."
+section: "Features"
+order: 5
+---
+
+## Timeouts
+
+```ts
+export default defineConfig({
+  baseUrl: "https://api.backend.com",
+  timeout: 8000,
+});
+```
+
+Disable timeout for a specific route:
+
+```ts
+return passIt({
+  path: "/heavy-report",
+  req,
+  timeout: false,
+});
+```
+
+## Retries
+
+Retries run only on configured server error statuses.
+
+```ts
+retry: {
+  times: 2,
+  onStatus: [500, 502, 503],
+}
+```
+
+## Normalization
+
+```ts
+normalize: true
+```
+
+Success shape:
+
+```ts
+{ success: true, status: 200, data: { id: "user_123" } }
+```
+
+Error shape:
+
+```ts
+{ success: false, status: 404, message: "not found" }
+```
+
+## Hooks
+
+```ts
+hooks: {
+  dev: {
+    onRequest: (req) => console.log(`--> ${req.method} ${req.path}`),
+    onResponse: (res) => console.log(`<-- ${res.status} ${res.duration}ms`),
+    onError: (err) => console.error(err.message),
+  },
+  prod: {
+    onError: (err) => Sentry.captureException(err),
+  },
+}
+```
