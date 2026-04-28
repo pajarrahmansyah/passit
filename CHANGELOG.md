@@ -2,7 +2,20 @@
 
 All notable changes to PassIt will be documented here.
 
-## [0.0.1] - 2026-04-27
+## [0.0.3] - 2026-04-28
+
+### Added
+- Added `apps/docs`, a standalone Next.js documentation site with MDX pages for getting started, configuration, route handlers, features, API reference, security, and troubleshooting.
+- Added `apps/example`, a standalone Next.js demo app covering PassIt route handlers, multi-service config, header merging, normalization, response transforms, retry/timeout behavior, text responses, and the optional axios adapter.
+
+### Changed
+- Updated docs content to match the current package contract, including `createPassIt`, typed `defineConfig` return values, optional `req`, retry behavior, and HTML response handling.
+- Simplified package build output by letting `tsup` generate bundled declarations for the public entry points.
+- Enabled JS minification for published package builds.
+- Removed the old declaration alias rewrite script because bundled declaration output no longer needs it.
+- Remove unnecessary part bundled for published package builds 
+
+## [0.0.2] - 2026-04-27
 
 ### Added
 - `createPassIt(config)` factory for route-safe config binding without relying on global registration
