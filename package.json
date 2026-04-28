@@ -29,7 +29,7 @@
     }
   },
   "scripts": {
-    "build": "rimraf dist && tsup && tsc --emitDeclarationOnly --outDir dist && node scripts/rewire-dts-aliases.mjs",
+    "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "typecheck:tests": "tsc -p tsconfig.test.json --noEmit",

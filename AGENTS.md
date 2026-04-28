@@ -66,7 +66,6 @@ passit/
 |   |-- docs/                 # online documentation website
 |   `-- example/              # demo app that consumes the package
 |-- scripts/
-|   |-- rewire-dts-aliases.mjs
 |   `-- run-live-tests.mjs
 |-- tsconfig.test.json
 `-- package.json

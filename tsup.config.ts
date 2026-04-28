@@ -5,15 +5,13 @@ export default defineConfig({
         index: 'src/index.ts',
         'next/plugin': 'src/next/plugin.ts'
     },
-    alias: {
-        '@': './src',
-    },
     format: ['cjs', 'esm'],
     outExtension({ format }) {
         return { js: format === 'cjs' ? '.cjs' : '.js' }
     },
-    dts: false,
+    dts: true,
     clean: true,
+    minify: true,
     sourcemap: true,
     external: ['axios', 'next'],
 })

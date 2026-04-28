@@ -25,7 +25,7 @@ function resolveServiceConfig(
 ): ServiceConfig {
     if (!config) {
         throw new Error(
-            '[PassIt] Config not found. Did you forget to import your passit.config.ts?\n\nSee setup guide: https://github.com/pajarrahmansyah/passit'
+            '[PassIt] Config not found. Did you forget to import your passit.config.ts? See setup guide: https://github.com/pajarrahmansyah/passit'
         )
     }
 

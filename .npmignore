@@ -9,6 +9,7 @@ node_modules/
 coverage/
 AGENTS.md
 CLAUDE.md
+.claude/
 tsconfig.json
 tsconfig.test.json
 .env*
@@ -26,6 +27,7 @@ vitest.config.ts
 # editor
 .vscode/
 .idea/
+.claude/
 
 # os
 .DS_Store
