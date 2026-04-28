@@ -71,7 +71,7 @@ export function DemoConsole({ routes }: DemoConsoleProps) {
         <button
           type="button"
           onClick={() => runDemo()}
-          className="inline-flex h-10 items-center gap-2 border border-foreground bg-[var(--acid)] px-4 text-sm font-bold transition hover:translate-x-0.5 hover:translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+          className="inline-flex h-10 items-center gap-2 border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-bold text-foreground transition hover:border-[var(--acid)] hover:text-[var(--acid)] disabled:cursor-wait disabled:opacity-70"
           disabled={isPending}
         >
           {isPending ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}

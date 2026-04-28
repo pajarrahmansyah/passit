@@ -11,6 +11,11 @@
   --acid: #d7ff42;
   --rust: #ff704d;
   --teal: #37c7bd;
+  --code-keyword: #d7ff42;
+  --code-string: #7fd7cf;
+  --code-number: #ff9f7f;
+  --code-boolean: #c7b8ff;
+  --code-line: #69715f;
 }
 
 :root[data-theme="light"] {
@@ -24,6 +29,11 @@
   --acid: #d7ff42;
   --rust: #b84a2f;
   --teal: #0f7b78;
+  --code-keyword: #d7ff42;
+  --code-string: #8de3dc;
+  --code-number: #ffb08f;
+  --code-boolean: #d5c8ff;
+  --code-line: #7f786b;
 }
 
 @theme inline {
@@ -79,4 +89,19 @@ body {
 
 .console-scroll::-webkit-scrollbar-corner {
   background: #11120f;
+}
+
+.code-surface {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--panel) 84%, var(--ink) 16%), var(--ink));
+  border: 1px solid color-mix(in srgb, var(--foreground) 14%, transparent);
+  color: #d8e8c2;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--acid) 12%, transparent);
+}
+
+:root[data-theme="light"] .code-surface {
+  background: #161713;
+  border-color: #161713;
+  color: #f6f3ea;
+  box-shadow: none;
 }

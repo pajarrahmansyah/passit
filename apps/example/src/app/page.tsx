@@ -1,3 +1,4 @@
+import { CodeSnippet } from "@/components/code-snippet";
 import { DemoConsole } from "@/components/demo-console";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -173,7 +174,7 @@ export default function Home() {
       </section>
 
       <section className="border-y border-foreground bg-[var(--ink)] text-[#f6f3ea]">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2 lg:grid-cols-4 py-6 px-0 sm:px-4">
           {features.map((feature) => (
             <article
               key={feature.title}
@@ -187,24 +188,20 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-7xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:px-10">
-        <div className="border border-foreground bg-[var(--panel)] p-5">
+      <section className="mx-auto grid w-full max-w-7xl min-w-0 gap-6 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:px-10">
+        <div className="min-w-0 border border-foreground bg-[var(--panel)] p-5">
           <div className="mb-4 flex items-center gap-2">
             <BadgeCheck className="size-5 text-[var(--teal)]" aria-hidden />
             <h2 className="text-xl font-bold">Config in `passit.config.ts`</h2>
           </div>
-          <pre className="overflow-x-auto bg-foreground p-5 text-sm leading-6 text-background">
-            <code>{configSnippet}</code>
-          </pre>
+          <CodeSnippet code={configSnippet} />
         </div>
-        <div className="border border-foreground bg-[var(--panel)] p-5">
+        <div className="min-w-0 border border-foreground bg-[var(--panel)] p-5">
           <div className="mb-4 flex items-center gap-2">
             <BadgeCheck className="size-5 text-[var(--rust)]" aria-hidden />
             <h2 className="text-xl font-bold">Route handler usage</h2>
           </div>
-          <pre className="overflow-x-auto bg-foreground p-5 text-sm leading-6 text-background">
-            <code>{routeSnippet}</code>
-          </pre>
+          <CodeSnippet code={routeSnippet} />
         </div>
       </section>
     </main>
